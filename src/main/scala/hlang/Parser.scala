@@ -1,21 +1,19 @@
 package hlang
 
+import hlang.element._
+import hlang.element.operator._
+import hlang.element.premitive._
+
 import scala.util.parsing.combinator.JavaTokenParsers
 
-class ConditionParser extends JavaTokenParsers {
+class Parser extends JavaTokenParsers {
 
-  def expr: Parser[Element] = term ~ rep("||" ~ term) ^^ {
-    case e ~ es =>
-      es.foldLeft(e) {
-        case (e1, "||" ~ e2) => Or(e1, e2)
-      }
+  def expr: Parser[Element] = term ~ rep("||" ~> term) ^^ {
+    case e ~ es => es.foldLeft(e) { case (e1, e2) => Or(e1, e2) }
   }
 
-  def term: Parser[Element] = eq ~ rep("&&" ~ eq) ^^ {
-    case e ~ es =>
-      es.foldLeft(e) {
-        case (e1, "&&" ~ e2) => And(e1, e2)
-      }
+  def term: Parser[Element] = eq ~ rep("&&" ~> eq) ^^ {
+    case e ~ es => es.foldLeft(e) { case (e1, e2) => And(e1, e2) }
   }
 
   def eq: Parser[Element] = comp ~ rep(("==" | "!=") ~ comp) ^^ {
@@ -26,7 +24,7 @@ class ConditionParser extends JavaTokenParsers {
       }
   }
 
-  def comp: Parser[Element] = addsub ~ rep(("<=" | ">=" | "<" | ">") ~ addsub) ^^ {
+  def comp: Parser[Element] = add ~ rep(("<=" | ">=" | "<" | ">") ~ add) ^^ {
     case e ~ es =>
       es.foldLeft(e) {
         case (e1, "<=" ~ e2) => LowerThanOrEqual(e1, e2)
@@ -36,7 +34,7 @@ class ConditionParser extends JavaTokenParsers {
       }
   }
 
-  def addsub: Parser[Element] = muldiv ~ rep(("+" | "-") ~ muldiv) ^^ {
+  def add: Parser[Element] = mul ~ rep(("+" | "-") ~ mul) ^^ {
     case e ~ es =>
       es.foldLeft(e) {
         case (e1, "+" ~ e2) => Add(e1, e2)
@@ -44,7 +42,7 @@ class ConditionParser extends JavaTokenParsers {
       }
   }
 
-  def muldiv: Parser[Element] = factor ~ rep(("*" | "/") ~ factor) ^^ {
+  def mul: Parser[Element] = factor ~ rep(("*" | "/") ~ factor) ^^ {
     case e ~ es =>
       es.foldLeft(e) {
         case (e1, "*" ~ e2) => Mul(e1, e2)
@@ -63,11 +61,15 @@ class ConditionParser extends JavaTokenParsers {
   def negative: Parser[Element] = "-" ~> factor ^^ (x => Negative(x))
 }
 
-object ConditionParserTest extends App {
-  val input = "-(100 * 2)"
-  val parser = new ConditionParser
-  val result = parser.parseAll(parser.expr, input)
+object ParserTest extends App {
+  val parser = new Parser
 
-  println(result)
-  println(Evaluator.eval(result.get))
+  while (true) {
+    print("> ")
+    val input = io.StdIn.readLine()
+    val result = parser.parseAll(parser.expr, input)
+
+    println(result)
+    println(result.get.eval)
+  }
 }
