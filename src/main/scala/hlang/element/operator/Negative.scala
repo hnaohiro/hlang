@@ -10,6 +10,6 @@ case class Negative(e: Element) extends UnaryOperator {
 
   def eval: Primitive = e.eval match {
     case Number(v) => Number(-v)
-    case v         => throw NotSupportedOperatorError(this, v)
+    case v         => throw NotSupportedOperatorError(pos, character, v)
   }
 }

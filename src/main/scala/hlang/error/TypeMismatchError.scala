@@ -2,15 +2,19 @@ package hlang.error
 
 import hlang.element.Primitive
 
-case class TypeMismatchError(found: Primitive, requiredType: Class[_], expression: String = "") extends Error {
+import scala.util.parsing.input.Position
+
+case class TypeMismatchError(position: Position, found: Primitive, requiredType: Class[_]) extends Error {
 
   override def toString: String = {
     s"""
-       |Type Mismatch Error:
+       |Type Mismatch Error: line: ${position.line}, column: ${position.column}
        |  found:    $found
        |  required: ${requiredType.getSimpleName.dropRight(1)}
        |
-       |> $expression
+       |```
+       |${position.longString}
+       |```
       """.stripMargin
   }
 }

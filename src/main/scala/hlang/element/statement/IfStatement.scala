@@ -10,7 +10,7 @@ case class IfStatement(cond: Element, ifStatement: Element, elseStatement: Eleme
     cond.eval match {
       case Bool(true)  => ifStatement.eval
       case Bool(false) => elseStatement.eval
-      case v           => throw TypeMismatchError(v, Bool.getClass, s"if $v:")
+      case v           => throw TypeMismatchError(pos, v, Bool.getClass)
     }
   }
 }

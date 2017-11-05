@@ -10,6 +10,6 @@ case class Not(e: Element) extends UnaryOperator {
 
   def eval: Primitive = e.eval match {
     case Bool(v) => Bool(!v)
-    case v       => throw NotSupportedOperatorError(this, v)
+    case v       => throw NotSupportedOperatorError(pos, character, v)
   }
 }
