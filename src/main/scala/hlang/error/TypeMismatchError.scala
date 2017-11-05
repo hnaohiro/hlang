@@ -1,17 +1,16 @@
 package hlang.error
 
-import hlang.element.{Operator, Primitive}
+import hlang.element.Primitive
 
-import scala.reflect.ClassTag
-
-case class TypeMismatchError[T <: Primitive](operator: Operator, found: Primitive)(implicit tag: ClassTag[T])
-    extends Error {
+case class TypeMismatchError(found: Primitive, requiredType: Class[_], expression: String = "") extends Error {
 
   override def toString: String = {
     s"""
-       |Type Mismatch Error: ${operator.expression}
+       |Type Mismatch Error:
        |  found:    $found
-       |  required: ${tag.runtimeClass.getSimpleName}
+       |  required: ${requiredType.getSimpleName.dropRight(1)}
+       |
+       |> $expression
       """.stripMargin
   }
 }

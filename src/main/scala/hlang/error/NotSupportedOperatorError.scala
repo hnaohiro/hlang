@@ -6,8 +6,10 @@ case class NotSupportedOperatorError(operator: Operator, found: Primitive) exten
 
   override def toString: String = {
     s"""
-        |Not Supported Operator Error: ${operator.expression}
+        |Not Supported Operator Error:
         |  `${operator.character}` operator is not supported in $found
+        |
+        |> ${operator.expression}
       """.stripMargin
   }
 }

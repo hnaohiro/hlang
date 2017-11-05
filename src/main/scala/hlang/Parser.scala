@@ -3,16 +3,23 @@ package hlang
 import hlang.element._
 import hlang.element.operator._
 import hlang.element.premitive._
+import hlang.element.statement.IfStatement
 
 import scala.util.parsing.combinator.JavaTokenParsers
 
 class Parser extends JavaTokenParsers {
 
-  def expr: Parser[Element] = term ~ rep("||" ~> term) ^^ {
+  def expr: Parser[Element] = or | ifStatement
+
+  def ifStatement: Parser[Element] = "if" ~ expr ~ ":" ~ expr ~ "else" ~ ":" ~ expr ^^ {
+    case "if" ~ cond ~ ":" ~ ifStatement ~ "else" ~ ":" ~ elseStatement => IfStatement(cond, ifStatement, elseStatement)
+  }
+
+  def or: Parser[Element] = and ~ rep("||" ~> and) ^^ {
     case e ~ es => es.foldLeft(e) { case (e1, e2) => Or(e1, e2) }
   }
 
-  def term: Parser[Element] = eq ~ rep("&&" ~> eq) ^^ {
+  def and: Parser[Element] = eq ~ rep("&&" ~> eq) ^^ {
     case e ~ es => es.foldLeft(e) { case (e1, e2) => And(e1, e2) }
   }
 
@@ -62,14 +69,17 @@ class Parser extends JavaTokenParsers {
 }
 
 object ParserTest extends App {
+  val input =
+    """
+      |if 10:
+      |  10 + 5
+      |else:
+      |  20
+    """.stripMargin
+
   val parser = new Parser
+  val result = parser.parseAll(parser.expr, input)
 
-  while (true) {
-    print("> ")
-    val input = io.StdIn.readLine()
-    val result = parser.parseAll(parser.expr, input)
-
-    println(result)
-    println(result.get.eval)
-  }
+  println(result)
+  println(result.get.eval)
 }

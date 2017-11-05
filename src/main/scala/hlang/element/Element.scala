@@ -21,4 +21,7 @@ trait UnaryOperator extends Operator {
 
 trait Primitive extends Element {
   def eval: Primitive = this
+  def expression: String = toString
 }
+
+trait Statement extends Element
