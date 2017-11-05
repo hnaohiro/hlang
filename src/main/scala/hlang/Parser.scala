@@ -4,13 +4,14 @@ import hlang.element._
 import hlang.element.operator._
 import hlang.element.premitive._
 import hlang.element.statement.IfStatement
+import hlang.element.variable.Variable
 
 import scala.util.parsing.combinator.JavaTokenParsers
 
 class Parser extends JavaTokenParsers {
 
   def expr: Parser[Element] = positioned {
-    or | ifStatement
+    ifStatement | or
   }
 
   def ifStatement: Parser[Element] = positioned {
@@ -75,15 +76,19 @@ class Parser extends JavaTokenParsers {
   }
 
   def factor: Parser[Element] = positioned {
-    number | bool | not | negative | "(" ~> expr <~ ")"
+    number | bool | not | negative | variable | "(" ~> expr <~ ")"
   }
 
-  def number: Parser[Number] = positioned {
+  def number: Parser[Element] = positioned {
     floatingPointNumber ^^ (x => Number(x.toDouble))
   }
 
-  def bool: Parser[Bool] = positioned {
+  def bool: Parser[Element] = positioned {
     ("true" | "false") ^^ (x => Bool(x.toBoolean))
+  }
+
+  def variable: Parser[Element] = positioned {
+    ident ^^ (x => Variable(x))
   }
 
   def not: Parser[Element] = positioned {
@@ -96,12 +101,17 @@ class Parser extends JavaTokenParsers {
 }
 
 object ParserTest extends App {
+  implicit val env: Env = Env(Map("gender" -> 1, "age" -> 28))
+
   val input =
     """
-      |if 1 + 2:
-      |  10 + 5
+      |if age >= 20:
+      |  if gender == 1:
+      |    100 * 1.5
+      |  else:
+      |    100
       |else:
-      |  20
+      |  -1
     """.stripMargin
 
   val parser = new Parser

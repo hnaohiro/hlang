@@ -1,9 +1,11 @@
 package hlang.element
 
+import hlang.Env
+
 import scala.util.parsing.input.Positional
 
 trait Element extends Positional {
-  def eval: Primitive
+  def eval(implicit env: Env): Primitive
 }
 
 trait Operator extends Element {
@@ -19,7 +21,7 @@ trait UnaryOperator extends Operator {
 }
 
 trait Primitive extends Element {
-  def eval: Primitive = this
+  def eval(implicit env: Env): Primitive = this
 }
 
 trait Statement extends Element
