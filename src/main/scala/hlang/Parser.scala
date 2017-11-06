@@ -6,6 +6,7 @@ import hlang.element.premitive._
 import hlang.element.statement.IfStatement
 import hlang.element.variable.Variable
 
+import scala.util.control.Exception.allCatch
 import scala.util.parsing.combinator.JavaTokenParsers
 
 class Parser extends JavaTokenParsers {
@@ -80,15 +81,20 @@ class Parser extends JavaTokenParsers {
   }
 
   def number: Parser[Element] = positioned {
-    floatingPointNumber ^^ (x => Number(x.toDouble))
+    floatingPointNumber ^^ { x =>
+      allCatch either x.toInt match {
+        case Left(_)  => FloatValue(x.toDouble)
+        case Right(v) => IntValue(v)
+      }
+    }
   }
 
   def bool: Parser[Element] = positioned {
-    ("true" | "false") ^^ (x => Bool(x.toBoolean))
+    ("true" | "false") ^^ (x => BoolValue(x.toBoolean))
   }
 
   def str: Parser[Element] = positioned {
-    "\"" ~> ident <~ "\"" ^^ (x => Str(x))
+    "\"" ~> ident <~ "\"" ^^ (x => StringValue(x))
   }
 
   def variable: Parser[Element] = positioned {
@@ -111,9 +117,9 @@ object ParserTest extends App {
     """
       |if age >= 20:
       |  if gender != "m":
-      |    100 * 1.5
+      |    100
       |  else:
-      |    100 * 2
+      |    1.1e+2
       |else:
       |  -1
     """.stripMargin

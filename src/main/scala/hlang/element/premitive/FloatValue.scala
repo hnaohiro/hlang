@@ -2,4 +2,4 @@ package hlang.element.premitive
 
 import hlang.element.Primitive
 
-case class Bool(value: Boolean) extends Primitive
+case class FloatValue(value: Double) extends Primitive

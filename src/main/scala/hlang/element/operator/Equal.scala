@@ -2,7 +2,7 @@ package hlang.element.operator
 
 import hlang.Env
 import hlang.element.{BinaryOperator, Element, Primitive}
-import hlang.element.premitive.{Bool, Number, Str}
+import hlang.element.premitive.{BoolValue, FloatValue, IntValue, StringValue}
 import hlang.error.{NotSupportedOperatorError, TypeMismatchError}
 
 case class Equal(e1: Element, e2: Element) extends BinaryOperator {
@@ -10,12 +10,16 @@ case class Equal(e1: Element, e2: Element) extends BinaryOperator {
   val character = "=="
 
   def eval(implicit env: Env): Primitive = (e1.eval, e2.eval) match {
-    case (Bool(v1), Bool(v2))     => Bool(v1 == v2)
-    case (Number(v1), Number(v2)) => Bool(v1 == v2)
-    case (Str(v1), Str(v2))       => Bool(v1 == v2)
-    case (Bool(_), v2)            => throw TypeMismatchError(v2.pos, v2, Bool.getClass)
-    case (Number(_), v2)          => throw TypeMismatchError(v2.pos, v2, Number.getClass)
-    case (Str(_), v2)             => throw TypeMismatchError(v2.pos, v2, Str.getClass)
-    case (v1, _)                  => throw NotSupportedOperatorError(pos, character, v1)
+    case (IntValue(v1), IntValue(v2))       => BoolValue(v1 == v2)
+    case (IntValue(v1), FloatValue(v2))     => BoolValue(v1 == v2)
+    case (FloatValue(v1), FloatValue(v2))   => BoolValue(v1 == v2)
+    case (FloatValue(v1), IntValue(v2))     => BoolValue(v1 == v2)
+    case (BoolValue(v1), BoolValue(v2))     => BoolValue(v1 == v2)
+    case (StringValue(v1), StringValue(v2)) => BoolValue(v1 == v2)
+    case (IntValue(_), v2)                  => throw TypeMismatchError(v2.pos, v2, IntValue.getClass)
+    case (FloatValue(_), v2)                => throw TypeMismatchError(v2.pos, v2, FloatValue.getClass)
+    case (BoolValue(_), v2)                 => throw TypeMismatchError(v2.pos, v2, BoolValue.getClass)
+    case (StringValue(_), v2)               => throw TypeMismatchError(v2.pos, v2, StringValue.getClass)
+    case (v1, _)                            => throw NotSupportedOperatorError(pos, character, v1)
   }
 }

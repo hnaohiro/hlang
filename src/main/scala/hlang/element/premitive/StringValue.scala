@@ -2,4 +2,4 @@ package hlang.element.premitive
 
 import hlang.element.Primitive
 
-case class Str(value: String) extends Primitive
+case class StringValue(value: String) extends Primitive
