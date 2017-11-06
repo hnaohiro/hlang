@@ -2,7 +2,7 @@ package hlang.element.operator
 
 import hlang.Env
 import hlang.element.{BinaryOperator, Element, Primitive}
-import hlang.element.premitive.Number
+import hlang.element.premitive.{Number, Str}
 import hlang.error.{NotSupportedOperatorError, TypeMismatchError}
 
 case class Mul(e1: Element, e2: Element) extends BinaryOperator {

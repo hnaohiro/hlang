@@ -1,7 +1,7 @@
 package hlang
 
 import hlang.element.Primitive
-import hlang.element.premitive.{Bool, Number}
+import hlang.element.premitive.{Bool, Number, Str}
 import hlang.error.NotSupportedTypeError
 
 class Env(private val variables: Map[String, Primitive]) {
@@ -10,13 +10,14 @@ class Env(private val variables: Map[String, Primitive]) {
 }
 
 object Env {
-  def apply(in: Map[String, AnyVal]): Env = {
+  def apply(in: Map[String, Any]): Env = {
     new Env(in.map {
       case (key, value: Int)     => (key, Number(value))
       case (key, value: Long)    => (key, Number(value))
       case (key, value: Float)   => (key, Number(value))
       case (key, value: Double)  => (key, Number(value))
       case (key, value: Boolean) => (key, Bool(value))
+      case (key, value: String)  => (key, Str(value))
       case (_, value)            => throw NotSupportedTypeError(value.getClass)
     })
   }

@@ -76,7 +76,7 @@ class Parser extends JavaTokenParsers {
   }
 
   def factor: Parser[Element] = positioned {
-    number | bool | not | negative | variable | "(" ~> expr <~ ")"
+    number | bool | str | variable | not | negative | "(" ~> expr <~ ")"
   }
 
   def number: Parser[Element] = positioned {
@@ -85,6 +85,10 @@ class Parser extends JavaTokenParsers {
 
   def bool: Parser[Element] = positioned {
     ("true" | "false") ^^ (x => Bool(x.toBoolean))
+  }
+
+  def str: Parser[Element] = positioned {
+    "\"" ~> ident <~ "\"" ^^ (x => Str(x))
   }
 
   def variable: Parser[Element] = positioned {
@@ -101,15 +105,15 @@ class Parser extends JavaTokenParsers {
 }
 
 object ParserTest extends App {
-  implicit val env: Env = Env(Map("gender" -> 1, "age" -> 28))
+  implicit val env: Env = Env(Map("gender" -> "m", "age" -> 28))
 
   val input =
     """
       |if age >= 20:
-      |  if gender == 1:
+      |  if gender != "m":
       |    100 * 1.5
       |  else:
-      |    100
+      |    100 * 2
       |else:
       |  -1
     """.stripMargin
